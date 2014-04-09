@@ -119,9 +119,9 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
                 [self addSubview:self.recordBtn];
                 
                 //Record Long Press Gesture on the record button
-                UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(startRecording:)];
-                [longPress setDelegate:self];
-                [self.recordBtn addGestureRecognizer:longPress];
+                _longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(startRecording:)];
+                [_longPress setDelegate:self];
+                [self.recordBtn addGestureRecognizer:_longPress];
                 
                 self.durationProgressBar = [[UIProgressView alloc]initWithFrame:CGRectMake(0.0, videoFrame.origin.y + videoFrame.size.height, videoFrame.size.width, 2.0)];
                 [self addSubview:self.durationProgressBar];

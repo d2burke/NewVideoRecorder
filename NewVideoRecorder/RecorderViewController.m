@@ -59,7 +59,14 @@
     //Create "save" button
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Save" style:UIBarButtonItemStyleBordered target:self action:@selector(saveVideo:)];
     
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Back Camera" style:UIBarButtonItemStyleBordered target:self action:@selector(switchCamera)];
+    
     [self.view addSubview:self.cam];
+}
+
+-(void)switchCamera{
+    self.navigationItem.leftBarButtonItem.title = ([self.navigationItem.leftBarButtonItem.title isEqualToString:@"Back Camera"]) ? @"Front Camera" : @"Back Camera";
+    [self.cam switchCamera];
 }
 
 -(IBAction)saveVideo:(id)sender
