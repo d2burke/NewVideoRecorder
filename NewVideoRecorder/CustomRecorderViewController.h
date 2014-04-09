@@ -19,4 +19,10 @@
 @property (nonatomic, strong) UILongPressGestureRecognizer *longPress;
 @property (nonatomic, strong) KZCameraView *cam;
 
+
+
+@property (nonatomic, strong) UIBarButtonItem *imagePreviewButton;
+
+
+
 @end

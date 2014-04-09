@@ -32,10 +32,19 @@
     //Create CameraView
 	_cam = [[KZCameraView alloc]initWithFrame:CGRectMake(0.0, 0.0, _viewWidth, _viewHeight - 64.0) withVideoPreviewFrame:CGRectMake(0.0, 0.0, _viewWidth, _viewWidth)];
     _cam.maxDuration = 10.0;
-    
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Save" style:UIBarButtonItemStyleBordered target:self action:@selector(saveVideo:)];
-    
     [self.view addSubview:_cam];
+    
+    //Initialize long press for preview view
+    _longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(startRecording:)];
+    [_longPress setDelegate:self];
+    [_cam.videoPreviewView addGestureRecognizer:_longPress];
+    
+    //Get first frame and add it to this button
+    _imagePreviewButton = [[UIBarButtonItem alloc] initWithTitle:@"Preview" style:UIBarButtonItemStylePlain target:self action:nil];
+    self.navigationItem.leftBarButtonItem = _imagePreviewButton;
+    
+    //Add Save button to nav
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Save" style:UIBarButtonItemStyleBordered target:self action:@selector(saveVideo:)];
 }
 
 - (void)didReceiveMemoryWarning
@@ -45,6 +54,10 @@
 }
 
 #pragma mark - KZCam Methods
+-(void)startRecording:(UILongPressGestureRecognizer*)gestureRecognizer{
+    [_cam startRecording:gestureRecognizer];
+}
+
 -(IBAction)saveVideo:(id)sender
 {
     [_cam saveVideoWithCompletionBlock:^(BOOL success) {

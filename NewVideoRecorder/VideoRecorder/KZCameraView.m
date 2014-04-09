@@ -34,7 +34,6 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
 @interface KZCameraView () <UIGestureRecognizerDelegate>
 
 @property (nonatomic, strong) CaptureManager *captureManager;
-@property (nonatomic, strong) UIView *videoPreviewView;
 @property (nonatomic, strong) AVCaptureVideoPreviewLayer *captureVideoPreviewLayer;
 @property (nonatomic, strong) UILabel *focusModeLabel;
 
@@ -76,21 +75,20 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
 {
     self = [super initWithFrame:frame];
     if (self) {
-        if ([self captureManager] == nil) {
+        if (_captureManager == nil) {
             CaptureManager *manager = [[CaptureManager alloc] init];
-            [self setCaptureManager:manager];
+            _captureManager = manager;
+            _captureManager.delegate = self;
             
-            [[self captureManager] setDelegate:self];
-            
-            if ([[self captureManager] setupSession]) {
+            if (self.captureManager.setupSession) {
                 // Create video preview layer and add it to the UI
-                AVCaptureVideoPreviewLayer *newCaptureVideoPreviewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:[[self captureManager] session]];
+                AVCaptureVideoPreviewLayer *newCaptureVideoPreviewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:[_captureManager session]];
                 
-                self.videoPreviewView = [[UIView alloc]init];
-                self.videoPreviewView.frame =  CGRectMake(0.0, 0.0, videoFrame.size.width, videoFrame.size.width);
-                CALayer *viewLayer = self.videoPreviewView.layer;
+                _videoPreviewView = [[UIView alloc]init];
+                _videoPreviewView.frame =  CGRectMake(0.0, 0.0, videoFrame.size.width, videoFrame.size.width);
+                CALayer *viewLayer = _videoPreviewView.layer;
                 [viewLayer setMasksToBounds:YES];
-                [self addSubview:self.videoPreviewView];
+                [self addSubview:_videoPreviewView];
                 
                 CGRect bounds = self.videoPreviewView.bounds;
                 [newCaptureVideoPreviewLayer setFrame:bounds];
@@ -132,7 +130,7 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
                 [newFocusModeLabel setTextColor:[UIColor colorWithRed:1.0 green:1.0 blue:1.0 alpha:0.50]];
                 AVCaptureFocusMode initialFocusMode = [[[self.captureManager videoInput] device] focusMode];
                 [newFocusModeLabel setText:[NSString stringWithFormat:@"focus: %@", [self stringForFocusMode:initialFocusMode]]];
-                [self.videoPreviewView addSubview:newFocusModeLabel];
+                [_videoPreviewView addSubview:newFocusModeLabel];
                 [self addObserver:self forKeyPath:@"captureManager.videoInput.device.focusMode" options:NSKeyValueObservingOptionNew context:AVCamFocusModeObserverContext];
                 [self setFocusModeLabel:newFocusModeLabel];
                 
@@ -140,14 +138,14 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
                 UITapGestureRecognizer *singleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapToAutoFocus:)];
                 [singleTap setDelegate:self];
                 [singleTap setNumberOfTapsRequired:1];
-                [self.videoPreviewView addGestureRecognizer:singleTap];
+                [_videoPreviewView addGestureRecognizer:singleTap];
                 
                 // Add a double tap gesture to reset the focus mode to continuous auto focus
                 UITapGestureRecognizer *doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapToContinouslyAutoFocus:)];
                 [doubleTap setDelegate:self];
                 [doubleTap setNumberOfTapsRequired:2];
                 [singleTap requireGestureRecognizerToFail:doubleTap];
-                [self.videoPreviewView addGestureRecognizer:doubleTap];
+                [_videoPreviewView addGestureRecognizer:doubleTap];
                 
                 //Create progress view for saving the video
                 self.progressView = [[UIView alloc]initWithFrame:videoFrame];
@@ -175,14 +173,22 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
                 
                 self.deleteLastBtn = [UIButton buttonWithType:UIButtonTypeRoundedRect];
                 self.deleteLastBtn.bounds = CGRectMake(0.0, 0.0, 100.0, 30.0);
-                self.deleteLastBtn.center = CGPointMake(60.0, self.videoPreviewView.frame.size.height + (self.frame.size.height - self.videoPreviewView.frame.size.height)/2);
+                self.deleteLastBtn.center = CGPointMake(60.0, _videoPreviewView.frame.size.height + (self.frame.size.height - self.videoPreviewView.frame.size.height)/2);
                 [self.deleteLastBtn setTitle:@"Delete" forState:UIControlStateNormal];
-                [self.deleteLastBtn addTarget:self.captureManager action:@selector(deleteLastAsset) forControlEvents:UIControlEventTouchUpInside];
+                [self.deleteLastBtn addTarget:_captureManager action:@selector(deleteLastAsset) forControlEvents:UIControlEventTouchUpInside];
                 [self addSubview:self.deleteLastBtn];
             }
         }
     }
     return self;
+}
+
+-(void) deleteLastAsset{
+    [_captureManager deleteLastAsset];
+}
+
+-(void)initUI{
+    //Set up KZ Recorder UI when custom UI is not implemented
 }
 
 -(void)setShowCameraSwitch:(BOOL)showCameraSwitch
@@ -330,6 +336,13 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
         [self.activityView stopAnimating];
         
         completion (success);
+        
+        //Generate NSNotification when image is available to be used by the custom viewcontroller
+        
+        UIImageView *firstFrameImageView = [[UIImageView alloc] initWithImage:_captureManager.firstFrame];
+        firstFrameImageView.frame = self.videoPreviewView.frame;
+        [self addSubview:firstFrameImageView];
+        
     }];
 }
 

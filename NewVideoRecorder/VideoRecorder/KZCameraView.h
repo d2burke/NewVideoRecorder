@@ -32,11 +32,15 @@
 
 @property (nonatomic, assign) float maxDuration;
 @property (nonatomic,assign) BOOL showCameraSwitch;
+
+//UI
+@property (nonatomic, strong) UIView *videoPreviewView;
 @property (nonatomic, strong) UILongPressGestureRecognizer *longPress;
 
 - (id)initWithFrame:(CGRect)frame withVideoPreviewFrame:(CGRect)videoFrame;
-- (void)saveVideoWithCompletionBlock:(void(^)(BOOL success))completion;
 - (IBAction)startRecording:(UILongPressGestureRecognizer*)recognizer;
+- (void)saveVideoWithCompletionBlock:(void(^)(BOOL success))completion;
+- (void) deleteLastAsset;
 - (void)switchCamera:(id)sender;
 
 @end

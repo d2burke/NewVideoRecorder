@@ -355,8 +355,28 @@
     self.exportSession = nil;
     
     __block id weakSelf = self;
+    __block UIImage *firstFrame;
     //delete stored pieces
     [self.assets enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(AVAsset *asset, NSUInteger idx, BOOL *stop) {
+        
+        AVAssetImageGenerator *generator = [[AVAssetImageGenerator alloc] initWithAsset:asset];
+        generator.appliesPreferredTrackTransform=TRUE;
+        CMTime thumbTime = CMTimeMakeWithSeconds(0,30);
+        
+        AVAssetImageGeneratorCompletionHandler handler = ^(CMTime requestedTime, CGImageRef im, CMTime actualTime, AVAssetImageGeneratorResult result, NSError *error){
+            if (result != AVAssetImageGeneratorSucceeded) {
+                NSLog(@"couldn't generate thumbnail, error:%@", error);
+            }
+            else{
+                NSLog(@"image generated %@", im);
+            }
+            
+            _firstFrame = [UIImage imageWithCGImage:im];
+        };
+        
+        CGSize maxSize = CGSizeMake(320, 180);
+        generator.maximumSize = maxSize;
+        [generator generateCGImagesAsynchronouslyForTimes:[NSArray arrayWithObject:[NSValue valueWithCMTime:thumbTime]] completionHandler:handler];
         
         NSURL *fileURL = nil;
         if ([asset isKindOfClass:AVURLAsset.class])

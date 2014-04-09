@@ -70,6 +70,7 @@
 @property (nonatomic,strong) NSMutableArray *assets;
 @property (nonatomic,assign) NSTimer *exportProgressBarTimer;
 @property (nonatomic,strong) AVAssetExportSession *exportSession;
+@property (nonatomic,strong) UIImage *firstFrame;
 
 - (BOOL) setupSession;
 - (void) startRecording;
