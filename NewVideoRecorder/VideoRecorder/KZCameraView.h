@@ -36,11 +36,12 @@
 //UI
 @property (nonatomic, strong) UIView *videoPreviewView;
 @property (nonatomic, strong) UILongPressGestureRecognizer *longPress;
+@property (nonatomic, strong) UIImage *firstFrame;
 
 - (id)initWithFrame:(CGRect)frame withVideoPreviewFrame:(CGRect)videoFrame;
 - (IBAction)startRecording:(UILongPressGestureRecognizer*)recognizer;
 - (void)saveVideoWithCompletionBlock:(void(^)(BOOL success))completion;
-- (void) deleteLastAsset;
+- (void)deleteLastAsset;
 - (void)switchCamera:(id)sender;
 
 @end

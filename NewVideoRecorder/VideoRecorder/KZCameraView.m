@@ -108,19 +108,6 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
                     [[[self captureManager] session] startRunning];
                 });
                 
-                //set record button image. Replace with any image
-                UIImage *recordImage = [UIImage imageNamed:@"recordBtn"];
-                self.recordBtn = [[UIImageView alloc]initWithImage:recordImage];
-                self.recordBtn.bounds = CGRectMake(0.0, 0.0, recordImage.size.width, recordImage.size.height);
-                self.recordBtn.center = CGPointMake(self.frame.size.width/2, self.videoPreviewView.frame.size.height + (self.frame.size.height - self.videoPreviewView.frame.size.height)/2);
-                self.recordBtn.userInteractionEnabled = YES;
-                [self addSubview:self.recordBtn];
-                
-                //Record Long Press Gesture on the record button
-                _longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(startRecording:)];
-                [_longPress setDelegate:self];
-                [self.recordBtn addGestureRecognizer:_longPress];
-                
                 self.durationProgressBar = [[UIProgressView alloc]initWithFrame:CGRectMake(0.0, videoFrame.origin.y + videoFrame.size.height, videoFrame.size.width, 2.0)];
                 [self addSubview:self.durationProgressBar];
                 
@@ -171,12 +158,8 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
                 [self.progressView addSubview:self.progressLabel];
                 [self.progressView addSubview:self.activityView];
                 
-                self.deleteLastBtn = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-                self.deleteLastBtn.bounds = CGRectMake(0.0, 0.0, 100.0, 30.0);
-                self.deleteLastBtn.center = CGPointMake(60.0, _videoPreviewView.frame.size.height + (self.frame.size.height - self.videoPreviewView.frame.size.height)/2);
-                [self.deleteLastBtn setTitle:@"Delete" forState:UIControlStateNormal];
-                [self.deleteLastBtn addTarget:_captureManager action:@selector(deleteLastAsset) forControlEvents:UIControlEventTouchUpInside];
-                [self addSubview:self.deleteLastBtn];
+//                [self initUI];
+                
             }
         }
     }
@@ -189,6 +172,26 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
 
 -(void)initUI{
     //Set up KZ Recorder UI when custom UI is not implemented
+    
+    //set record button image. Replace with any image
+    UIImage *recordImage = [UIImage imageNamed:@"recordBtn"];
+    self.recordBtn = [[UIImageView alloc]initWithImage:recordImage];
+    self.recordBtn.bounds = CGRectMake(0.0, 0.0, recordImage.size.width, recordImage.size.height);
+    self.recordBtn.center = CGPointMake(self.frame.size.width/2, self.videoPreviewView.frame.size.height + (self.frame.size.height - self.videoPreviewView.frame.size.height)/2);
+    self.recordBtn.userInteractionEnabled = YES;
+    [self addSubview:self.recordBtn];
+
+    //Record Long Press Gesture on the record button
+    _longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(startRecording:)];
+    [_longPress setDelegate:self];
+    [self.recordBtn addGestureRecognizer:_longPress];
+    
+    self.deleteLastBtn = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    self.deleteLastBtn.bounds = CGRectMake(0.0, 0.0, 100.0, 30.0);
+    self.deleteLastBtn.center = CGPointMake(60.0, _videoPreviewView.frame.size.height + (self.frame.size.height - self.videoPreviewView.frame.size.height)/2);
+    [self.deleteLastBtn setTitle:@"Delete" forState:UIControlStateNormal];
+    [self.deleteLastBtn addTarget:_captureManager action:@selector(deleteLastAsset) forControlEvents:UIControlEventTouchUpInside];
+    [self addSubview:self.deleteLastBtn];
 }
 
 -(void)setShowCameraSwitch:(BOOL)showCameraSwitch
@@ -335,13 +338,9 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
         
         [self.activityView stopAnimating];
         
+        _firstFrame = _captureManager.firstFrame;
+        
         completion (success);
-        
-        //Generate NSNotification when image is available to be used by the custom viewcontroller
-        
-        UIImageView *firstFrameImageView = [[UIImageView alloc] initWithImage:_captureManager.firstFrame];
-        firstFrameImageView.frame = self.videoPreviewView.frame;
-        [self addSubview:firstFrameImageView];
         
     }];
 }
