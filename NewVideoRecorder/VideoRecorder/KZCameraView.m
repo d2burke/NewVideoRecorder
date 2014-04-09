@@ -210,7 +210,7 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
     }
 }
 
--(void)switchCamera
+- (void)switchCamera:(id)sender
 {
     [self.captureManager switchCamera];
 }

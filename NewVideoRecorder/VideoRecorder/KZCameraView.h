@@ -37,6 +37,6 @@
 - (id)initWithFrame:(CGRect)frame withVideoPreviewFrame:(CGRect)videoFrame;
 - (void)saveVideoWithCompletionBlock:(void(^)(BOOL success))completion;
 - (IBAction)startRecording:(UILongPressGestureRecognizer*)recognizer;
--(void)switchCamera;
+- (void)switchCamera:(id)sender;
 
 @end

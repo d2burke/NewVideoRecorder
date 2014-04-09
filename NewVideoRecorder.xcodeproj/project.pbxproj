@@ -35,6 +35,7 @@
 		6E96671A187DB939002705E6 /* recordBtn@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6E966716187DB939002705E6 /* recordBtn@2x.png */; };
 		6E96671B187DB939002705E6 /* switchCamera.png in Resources */ = {isa = PBXBuildFile; fileRef = 6E966717187DB939002705E6 /* switchCamera.png */; };
 		6E96671C187DB939002705E6 /* switchCamera@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6E966718187DB939002705E6 /* switchCamera@2x.png */; };
+		C5E6295318F5BD230003E012 /* CustomRecorderViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C5E6295218F5BD230003E012 /* CustomRecorderViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -85,6 +86,8 @@
 		6E966716187DB939002705E6 /* recordBtn@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "recordBtn@2x.png"; sourceTree = "<group>"; };
 		6E966717187DB939002705E6 /* switchCamera.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = switchCamera.png; sourceTree = "<group>"; };
 		6E966718187DB939002705E6 /* switchCamera@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "switchCamera@2x.png"; sourceTree = "<group>"; };
+		C5E6295118F5BD230003E012 /* CustomRecorderViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomRecorderViewController.h; sourceTree = "<group>"; };
+		C5E6295218F5BD230003E012 /* CustomRecorderViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomRecorderViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -162,6 +165,8 @@
 				6E28FD51181615AE00155DB8 /* Main.storyboard */,
 				6E52CA9F1818C14A00B92B94 /* RecorderViewController.h */,
 				6E52CAA01818C14A00B92B94 /* RecorderViewController.m */,
+				C5E6295118F5BD230003E012 /* CustomRecorderViewController.h */,
+				C5E6295218F5BD230003E012 /* CustomRecorderViewController.m */,
 				6E28FD57181615AE00155DB8 /* Images.xcassets */,
 				6E28FD46181615AD00155DB8 /* Supporting Files */,
 			);
@@ -334,6 +339,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6E52CAAD1818CF6600B92B94 /* AVCamUtilities.m in Sources */,
+				C5E6295318F5BD230003E012 /* CustomRecorderViewController.m in Sources */,
 				6E52CAAE1818CF6600B92B94 /* CaptureManager.m in Sources */,
 				6E52CAAC1818CF6600B92B94 /* AVCamRecorder.m in Sources */,
 				6E52CAA11818C14A00B92B94 /* RecorderViewController.m in Sources */,
