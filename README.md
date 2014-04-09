@@ -1,6 +1,11 @@
 VideoRecorder
 ================
-Needs more work.
+Needs more work. (More work, by Daniel Burke)
+
+This is a fine video recorder by [Kseniya Zito](https://github.com/Kseniya "Her Github Account").  I'm taking the time to add a few convenience methods that will allow for more flexible UI implementations.
+
+Find All original Documentation Below
+------------------------
 
 Vine like video recorder. Hold you finger - record, let it go - stop recording.
 Ability to switch between front and back camera, plus deleting last recorded piece.

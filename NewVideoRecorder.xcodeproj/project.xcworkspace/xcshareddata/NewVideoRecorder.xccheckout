@@ -5,34 +5,34 @@
 	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
 	<false/>
 	<key>IDESourceControlProjectIdentifier</key>
-	<string>F9F34605-38D3-4E6D-BA1E-C2D53C7A9861</string>
+	<string>750B2A40-C0DE-4E6A-88E1-02499B4B16AC</string>
 	<key>IDESourceControlProjectName</key>
 	<string>NewVideoRecorder</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
-		<key>890D3B44-B9B0-4C04-AD32-A51AD7FA5B27</key>
-		<string>https://github.com/Kseniya/NewVideoRecorder.git</string>
+		<key>245AC9E4-F65C-479E-8CE0-3CCCC7C75B7D</key>
+		<string>https://github.com/d2burke/NewVideoRecorder.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
 	<string>NewVideoRecorder.xcodeproj/project.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
-		<key>890D3B44-B9B0-4C04-AD32-A51AD7FA5B27</key>
+		<key>245AC9E4-F65C-479E-8CE0-3CCCC7C75B7D</key>
 		<string>../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
-	<string>https://github.com/Kseniya/NewVideoRecorder.git</string>
+	<string>https://github.com/d2burke/NewVideoRecorder.git</string>
 	<key>IDESourceControlProjectVersion</key>
 	<integer>110</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>890D3B44-B9B0-4C04-AD32-A51AD7FA5B27</string>
+	<string>245AC9E4-F65C-479E-8CE0-3CCCC7C75B7D</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>890D3B44-B9B0-4C04-AD32-A51AD7FA5B27</string>
+			<string>245AC9E4-F65C-479E-8CE0-3CCCC7C75B7D</string>
 			<key>IDESourceControlWCCName</key>
 			<string>NewVideoRecorder</string>
 		</dict>
