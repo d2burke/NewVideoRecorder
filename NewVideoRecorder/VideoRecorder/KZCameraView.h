@@ -26,6 +26,8 @@
 
 #import <UIKit/UIKit.h>
 
+extern NSString * const KZVideoProgressEvent;
+
 @class CaptureManager, AVCamPreviewView, AVCaptureVideoPreviewLayer;
 
 @interface KZCameraView : UIView <UIImagePickerControllerDelegate, UINavigationControllerDelegate>

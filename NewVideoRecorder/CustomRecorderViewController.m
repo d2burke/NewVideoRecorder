@@ -29,10 +29,19 @@
     _viewWidth = self.view.frame.size.width;
     _viewHeight = self.view.frame.size.height;
     
+    [[NSNotificationCenter defaultCenter]  addObserver:self
+                                              selector:@selector(updateDuration:)
+                                                  name:KZVideoProgressEvent
+                                                object:nil];
+    
     //Create CameraView
 	_cam = [[KZCameraView alloc]initWithFrame:CGRectMake(0.0, 0.0, _viewWidth, _viewHeight - 64.0) withVideoPreviewFrame:CGRectMake(0.0, 0.0, _viewWidth, _viewWidth)];
     _cam.maxDuration = 10.0;
     [self.view addSubview:_cam];
+    
+    _progressView = [[UIView alloc] initWithFrame:CGRectMake(0, _viewWidth-40, 0, 40)];
+    _progressView.backgroundColor = [[UIColor blueColor] colorWithAlphaComponent:0.2];
+    [self.view addSubview:_progressView];
     
     //Initialize long press for preview view
     _longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(startRecording:)];
@@ -40,8 +49,8 @@
     [_cam.videoPreviewView addGestureRecognizer:_longPress];
     
     //Get first frame and add it to this button
-    _imagePreviewButton = [[UIBarButtonItem alloc] initWithTitle:@"Delete" style:UIBarButtonItemStylePlain target:self action:@selector(deleteLast)];
-    self.navigationItem.leftBarButtonItem = _imagePreviewButton;
+    _deleteButton = [[UIBarButtonItem alloc] initWithTitle:@"Delete" style:UIBarButtonItemStylePlain target:self action:@selector(deleteLast)];
+    self.navigationItem.leftBarButtonItem = _deleteButton;
     
     //Add Save button to nav
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Save" style:UIBarButtonItemStyleBordered target:self action:@selector(saveVideo:)];
@@ -53,6 +62,14 @@
     [cameraTypeButton addTarget:self action:@selector(switchCameraType:) forControlEvents:UIControlEventTouchUpInside];
     self.navigationItem.titleView = cameraTypeButton;
     
+}
+
+-(void)updateDuration:(NSNotification*)notification{
+    //Handle duration notification event
+    CGFloat progress = [[[notification userInfo] objectForKey:@"progress"] floatValue];
+    CGRect progressFrame = _progressView.frame;
+    progressFrame.size.width = _viewWidth * progress;
+    _progressView.frame = progressFrame;
 }
 
 - (void)didReceiveMemoryWarning

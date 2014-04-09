@@ -29,6 +29,8 @@
 #import "AVCamRecorder.h"
 #import <AVFoundation/AVFoundation.h>
 
+NSString * const KZVideoProgressEvent = @"KZVideoProgressEvent";
+
 static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
 
 @interface KZCameraView () <UIGestureRecognizerDelegate>
@@ -166,6 +168,10 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
     return self;
 }
 
+//TODO: - Send notification of progress as video is recorded
+
+//TODO: - Expose a getter for current progress for updating custom UI
+
 -(void) deleteLastAsset{
     [_captureManager deleteLastAsset];
 }
@@ -299,6 +305,13 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
     {
         self.duration = self.duration + 0.1;
         self.durationProgressBar.progress = self.duration/self.maxDuration;
+        
+        
+        NSDictionary *userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithFloat:self.duration/self.maxDuration] forKey:@"progress"];
+        [[NSNotificationCenter defaultCenter] postNotificationName:KZVideoProgressEvent
+                                                            object:self
+                                                          userInfo:userInfo];
+    
         NSLog(@"self.duration %f, self.progressBar %f", self.duration, self.durationProgressBar.progress);
         if (self.durationProgressBar.progress > .99) {
             [self.durationTimer invalidate];
@@ -338,6 +351,7 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
         
         [self.activityView stopAnimating];
         
+        //Set first frame image before calling completion
         _firstFrame = _captureManager.firstFrame;
         
         completion (success);

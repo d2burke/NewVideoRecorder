@@ -370,7 +370,7 @@
             else{
                 NSLog(@"image generated %@", im);
             }
-            
+                        
             _firstFrame = [UIImage imageWithCGImage:im];
         };
         
