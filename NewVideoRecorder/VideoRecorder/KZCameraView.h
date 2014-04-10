@@ -39,6 +39,9 @@ extern NSString * const KZVideoProgressEvent;
 @property (nonatomic, strong) UIView *videoPreviewView;
 @property (nonatomic, strong) UILongPressGestureRecognizer *longPress;
 @property (nonatomic, strong) UIImage *firstFrame;
+@property (nonatomic, strong) NSMutableArray *segmentDurations;
+@property (nonatomic, strong) NSMutableDictionary *durationDict;
+@property (nonatomic) CGRect videoFrame;
 
 - (id)initWithFrame:(CGRect)frame withVideoPreviewFrame:(CGRect)videoFrame;
 - (IBAction)startRecording:(UILongPressGestureRecognizer*)recognizer;

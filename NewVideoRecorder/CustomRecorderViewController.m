@@ -66,6 +66,11 @@
 
 -(void)updateDuration:(NSNotification*)notification{
     //Handle duration notification event
+    
+    //TODO: Send back an array of duration values,
+    //      instead of one continuous value so we can
+    //      draw the pieces separately if desired
+    
     CGFloat progress = [[[notification userInfo] objectForKey:@"progress"] floatValue];
     CGRect progressFrame = _progressView.frame;
     progressFrame.size.width = _viewWidth * progress;

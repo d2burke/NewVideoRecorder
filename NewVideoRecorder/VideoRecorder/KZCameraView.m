@@ -75,6 +75,8 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
 
 - (id)initWithFrame:(CGRect)frame withVideoPreviewFrame:(CGRect)videoFrame
 {
+    _videoFrame = videoFrame;
+    
     self = [super initWithFrame:frame];
     if (self) {
         if (_captureManager == nil) {
@@ -82,12 +84,15 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
             _captureManager = manager;
             _captureManager.delegate = self;
             
+            _segmentDurations = [[NSMutableArray alloc] init];
+            _durationDict = [[NSMutableDictionary alloc] init];
+            
             if (self.captureManager.setupSession) {
                 // Create video preview layer and add it to the UI
                 AVCaptureVideoPreviewLayer *newCaptureVideoPreviewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:[_captureManager session]];
                 
                 _videoPreviewView = [[UIView alloc]init];
-                _videoPreviewView.frame =  CGRectMake(0.0, 0.0, videoFrame.size.width, videoFrame.size.width);
+                _videoPreviewView.frame =  CGRectMake(0.0, 0.0, _videoFrame.size.width, _videoFrame.size.width);
                 CALayer *viewLayer = _videoPreviewView.layer;
                 [viewLayer setMasksToBounds:YES];
                 [self addSubview:_videoPreviewView];
@@ -109,9 +114,6 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
                 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                     [[[self captureManager] session] startRunning];
                 });
-                
-                self.durationProgressBar = [[UIProgressView alloc]initWithFrame:CGRectMake(0.0, videoFrame.origin.y + videoFrame.size.height, videoFrame.size.width, 2.0)];
-                [self addSubview:self.durationProgressBar];
                 
                 // Create the focus mode UI overlay
                 UILabel *newFocusModeLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 10, viewLayer.bounds.size.width - 20, 20)];
@@ -135,30 +137,6 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
                 [doubleTap setNumberOfTapsRequired:2];
                 [singleTap requireGestureRecognizerToFail:doubleTap];
                 [_videoPreviewView addGestureRecognizer:doubleTap];
-                
-                //Create progress view for saving the video
-                self.progressView = [[UIView alloc]initWithFrame:videoFrame];
-                self.progressView.backgroundColor = [UIColor clearColor];
-                self.progressView.hidden = YES;
-                
-                self.progressBar = [[UIProgressView alloc]initWithFrame:CGRectMake(0.0, 0.0, videoFrame.size.width - 60.0, 2.0)];
-                
-                self.progressLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0, 0.0, videoFrame.size.width - 60.0, 20.0)];
-                self.progressLabel.backgroundColor = [UIColor clearColor];
-                self.progressLabel.textColor = [UIColor whiteColor];
-                self.progressLabel.textAlignment = NSTextAlignmentCenter;
-                
-                self.activityView = [[UIActivityIndicatorView alloc]initWithFrame:CGRectMake(0.0, 0.0, 50.0, 50.0)];
-                self.activityView.hidesWhenStopped = YES;
-                
-                self.progressBar.center = self.progressView.center;
-                self.activityView.center = self.progressView.center;
-                self.progressLabel.center = CGPointMake(self.progressView.center.x, self.progressView.center.y + 20.0);
-                
-                [self addSubview:self.progressView];
-                [self.progressView addSubview:self.progressBar];
-                [self.progressView addSubview:self.progressLabel];
-                [self.progressView addSubview:self.activityView];
                 
 //                [self initUI];
                 
@@ -198,6 +176,34 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
     [self.deleteLastBtn setTitle:@"Delete" forState:UIControlStateNormal];
     [self.deleteLastBtn addTarget:_captureManager action:@selector(deleteLastAsset) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:self.deleteLastBtn];
+    
+    //Create progress view for saving the video
+    
+    self.durationProgressBar = [[UIProgressView alloc]initWithFrame:CGRectMake(0.0, _videoFrame.origin.y + _videoFrame.size.height, _videoFrame.size.width, 2.0)];
+    [self addSubview:self.durationProgressBar];
+    
+    self.progressView = [[UIView alloc]initWithFrame:_videoFrame];
+    self.progressView.backgroundColor = [UIColor clearColor];
+    self.progressView.hidden = YES;
+    
+    self.progressBar = [[UIProgressView alloc]initWithFrame:CGRectMake(0.0, 0.0, _videoFrame.size.width - 60.0, 2.0)];
+    
+    self.progressLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0, 0.0, _videoFrame.size.width - 60.0, 20.0)];
+    self.progressLabel.backgroundColor = [UIColor clearColor];
+    self.progressLabel.textColor = [UIColor whiteColor];
+    self.progressLabel.textAlignment = NSTextAlignmentCenter;
+    
+    self.activityView = [[UIActivityIndicatorView alloc]initWithFrame:CGRectMake(0.0, 0.0, 50.0, 50.0)];
+    self.activityView.hidesWhenStopped = YES;
+    
+    self.progressBar.center = self.progressView.center;
+    self.activityView.center = self.progressView.center;
+    self.progressLabel.center = CGPointMake(self.progressView.center.x, self.progressView.center.y + 20.0);
+    
+    [self addSubview:self.progressView];
+    [self.progressView addSubview:self.progressBar];
+    [self.progressView addSubview:self.progressLabel];
+    [self.progressView addSubview:self.activityView];
 }
 
 -(void)setShowCameraSwitch:(BOOL)showCameraSwitch
@@ -292,6 +298,26 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
                 self.videoPreviewView.layer.borderColor = [UIColor clearColor].CGColor;
                 NSLog(@"END number of pieces %lu", (unsigned long)[self.captureManager.assets count]);
             }
+            
+            
+            //Add last duration to segmentDurations array, then
+            //set self.duration to 0 so we can start over
+            [_segmentDurations addObject:[NSNumber numberWithFloat:self.duration]];
+            [_durationDict setObject:_segmentDurations forKey:@"durations"];
+            
+            //Get sum of all duration segments
+            CGFloat sum = 0;
+            for (NSString *num in _segmentDurations)
+            {
+                sum += [num floatValue];
+            }
+            
+            //Also, keep track of the overall duration
+            [_durationDict setObject:[NSNumber numberWithFloat:sum] forKey:@"totalDuration"];
+            
+            //Reset current duration
+            self.duration = 0;
+            
             break;
         }
         default:
@@ -304,10 +330,16 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
     if ([[[self captureManager] recorder] isRecording])
     {
         self.duration = self.duration + 0.1;
-        self.durationProgressBar.progress = self.duration/self.maxDuration;
+        CGFloat totalDuration = self.duration;
+        
+        //Add other durations to the current duration
+        if([_segmentDurations count]){
+            totalDuration = [[_durationDict objectForKey:@"totalDuration"] floatValue] + self.duration;
+        }
+        self.durationProgressBar.progress = totalDuration/self.maxDuration;
         
         
-        NSDictionary *userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithFloat:self.duration/self.maxDuration] forKey:@"progress"];
+        NSDictionary *userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithFloat:totalDuration/self.maxDuration] forKey:@"progress"];
         [[NSNotificationCenter defaultCenter] postNotificationName:KZVideoProgressEvent
                                                             object:self
                                                           userInfo:userInfo];
@@ -328,8 +360,19 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
 
 - (void) removeTimeFromDuration:(float)removeTime;
 {
-    self.duration = self.duration - removeTime;
-    self.durationProgressBar.progress = self.duration/self.maxDuration;
+    CGFloat totalDuration = [[_durationDict objectForKey:@"totalDuration"] floatValue];
+    totalDuration = totalDuration - removeTime;
+    [_durationDict setObject:[NSNumber numberWithFloat:totalDuration] forKey:@"totalDuration"];
+    
+    //Also remove last object from _segmentDurations
+    [_segmentDurations removeLastObject];
+    
+    NSDictionary *userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithFloat:totalDuration/self.maxDuration] forKey:@"progress"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:KZVideoProgressEvent
+                                                        object:self
+                                                      userInfo:userInfo];
+    
+    self.durationProgressBar.progress = totalDuration/self.maxDuration;
 }
 
 - (void)saveVideoWithCompletionBlock:(void(^)(BOOL success))completion {
