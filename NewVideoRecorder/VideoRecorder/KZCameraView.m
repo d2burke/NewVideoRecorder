@@ -30,6 +30,8 @@
 #import <AVFoundation/AVFoundation.h>
 
 NSString * const KZVideoProgressEvent = @"KZVideoProgressEvent";
+NSString * const KZVideoEndEvent = @"KZVideoEndEvent";
+NSString * const KZVideoSavedEvent = @"KZVideoSavedEvent";
 
 static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
 
@@ -137,9 +139,6 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
                 [doubleTap setNumberOfTapsRequired:2];
                 [singleTap requireGestureRecognizerToFail:doubleTap];
                 [_videoPreviewView addGestureRecognizer:doubleTap];
-                
-//                [self initUI];
-                
             }
         }
     }
@@ -156,6 +155,8 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
 
 -(void)initUI{
     //Set up KZ Recorder UI when custom UI is not implemented
+    
+    [self setShowCameraSwitch:YES];
     
     //set record button image. Replace with any image
     UIImage *recordImage = [UIImage imageNamed:@"recordBtn"];
@@ -273,6 +274,23 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
 
 #pragma mark
 
+-(void)calculateDuration{
+    //Add last duration to segmentDurations array, then
+    //set self.duration to 0 so we can start over
+    [_segmentDurations addObject:[NSNumber numberWithFloat:self.duration]];
+    [_durationDict setObject:_segmentDurations forKey:@"durations"];
+    
+    //Get sum of all duration segments
+    CGFloat sum = 0;
+    for (NSString *num in _segmentDurations)
+    {
+        sum += [num floatValue];
+    }
+    
+    //Also, keep track of the overall duration
+    [_durationDict setObject:[NSNumber numberWithFloat:sum] forKey:@"totalDuration"];
+}
+
 - (IBAction)startRecording:(UILongPressGestureRecognizer*)recognizer
 {
     switch (recognizer.state)
@@ -299,21 +317,7 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
                 NSLog(@"END number of pieces %lu", (unsigned long)[self.captureManager.assets count]);
             }
             
-            
-            //Add last duration to segmentDurations array, then
-            //set self.duration to 0 so we can start over
-            [_segmentDurations addObject:[NSNumber numberWithFloat:self.duration]];
-            [_durationDict setObject:_segmentDurations forKey:@"durations"];
-            
-            //Get sum of all duration segments
-            CGFloat sum = 0;
-            for (NSString *num in _segmentDurations)
-            {
-                sum += [num floatValue];
-            }
-            
-            //Also, keep track of the overall duration
-            [_durationDict setObject:[NSNumber numberWithFloat:sum] forKey:@"totalDuration"];
+            [self calculateDuration];
             
             //Reset current duration
             self.duration = 0;
@@ -343,12 +347,24 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
         [[NSNotificationCenter defaultCenter] postNotificationName:KZVideoProgressEvent
                                                             object:self
                                                           userInfo:userInfo];
-    
-        NSLog(@"self.duration %f, self.progressBar %f", self.duration, self.durationProgressBar.progress);
-        if (self.durationProgressBar.progress > .99) {
+        
+        if (totalDuration/self.maxDuration > .99) {
+            
+            //Clear out timers
             [self.durationTimer invalidate];
             self.durationTimer = nil;
             [[self captureManager] stopRecording];
+            
+            [self calculateDuration];
+            
+            //Send end event
+            NSDictionary *userInfo = [NSDictionary dictionaryWithObject:_durationDict forKey:@"duration"];
+            [[NSNotificationCenter defaultCenter] postNotificationName:KZVideoEndEvent
+                                                                object:self
+                                                              userInfo:userInfo];
+            
+            [_segmentDurations removeAllObjects];
+            [_durationDict removeAllObjects];
         }
     }
     else
@@ -394,8 +410,14 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
         
         [self.activityView stopAnimating];
         
-        //Set first frame image before calling completion
-        _firstFrame = _captureManager.firstFrame;
+        //Send final video info notification
+        NSDictionary *videoInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                                   _durationDict, @"Duration",
+                                   _captureManager.firstFrame, @"FirstFrame",
+                                   nil];
+        [[NSNotificationCenter defaultCenter] postNotificationName:KZVideoSavedEvent
+                                                            object:self
+                                                          userInfo:videoInfo];
         
         completion (success);
         

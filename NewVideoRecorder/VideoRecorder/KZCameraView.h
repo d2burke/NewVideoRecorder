@@ -24,9 +24,13 @@
 //
 //
 
+//TODO:
+
 #import <UIKit/UIKit.h>
 
 extern NSString * const KZVideoProgressEvent;
+extern NSString * const KZVideoEndEvent;
+extern NSString * const KZVideoSavedEvent;
 
 @class CaptureManager, AVCamPreviewView, AVCaptureVideoPreviewLayer;
 
@@ -48,5 +52,6 @@ extern NSString * const KZVideoProgressEvent;
 - (void)saveVideoWithCompletionBlock:(void(^)(BOOL success))completion;
 - (void)deleteLastAsset;
 - (void)switchCamera:(id)sender;
+- (void)initUI;
 
 @end
